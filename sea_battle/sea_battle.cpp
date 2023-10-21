@@ -4,9 +4,19 @@
 //
 
 #include <iostream>
-
+#include <math.h>
 bool boolean_field[10][10];     //создаем булевское поле
 
+void proverka()
+{
+    for (int i = 0; i < 10; i++) {
+        for (int j = 0; j < 10; j++) {
+            bool b = boolean_field[i][j];
+            std::cout << b << "\t";
+        }
+        std::cout << '\n';
+    }
+}
 
 
 //функция заполнения булевского поля
@@ -14,15 +24,15 @@ void field( int a, int b , int x, int y)
 {
     if (a - x == 0 && b - y < 0)
     {
-        for (; b <= y; b++)
+        for (; b < y; b++)
         {
-            boolean_field[a - 1][b - 1] == true;
+            boolean_field[a - 1][b - 1] = true;
         }
     }
 
     if (a - x == 0 && b - y > 0)
     {
-        for (; b >= y; b--)
+        for (; b > y; b--)
         {
             boolean_field[a - 1][b - 1] = true;    
         }
@@ -30,7 +40,7 @@ void field( int a, int b , int x, int y)
 
     if (a - x < 0 && b - y == 0)
     {
-        for (; a <= x; a++)
+        for (; a < x; a++)
         {
             boolean_field[a - 1][b - 1] = true;
         }
@@ -38,7 +48,7 @@ void field( int a, int b , int x, int y)
 
     if (a - x > 0 && b - y == 0)
     {
-        for (; a >= x; a--)
+        for (; a > x; a--)
         {
             boolean_field[a - 1][b - 1] = true;
         }
@@ -53,6 +63,11 @@ void field( int a, int b , int x, int y)
 // функция проверки корректности расстановки кораблей
 bool correction(int a, int b, int x, int y)
 {
+    // проверка на диагональное расположение корабля
+    if (a - x != 0 && b - y != 0)
+    {
+        return false;
+    }
     // проверка на горизонтальное расположение корабля
     if (a - x == 0 && b - y < 0)
     {
@@ -165,7 +180,8 @@ int correct_of_input_Y(int y)
 
 int main()
 {
-      //создаем булевское поле
+    proverka();
+     
     int a = 0, b = 0; // координаты начала корабля
     int x = 0, y = 0; // координаты конца корабля
 
@@ -174,63 +190,149 @@ int main()
     {
         std::cout << "enter the coordinates of 1 deck " << i+1 <<" ship using a enter : " << std::endl;
 
-        std::cin >> x;
-        x = correct_of_input_X(x);    // проверка корректности ввода x;
-        std::cin >> y;
-        y = correct_of_input_Y(y);    // проверка корректности ввода y;
-        a = x;
-        b = y;
-        if (correction(a, b, x, y))
+        std::cin >> a;
+        a = correct_of_input_X(a);    // проверка корректности ввода x;
+        std::cin >> b;
+        b = correct_of_input_Y(b);    // проверка корректности ввода y;
+        x = a;
+        y = b;
+        if (correction(a, b, x, y))   // если ввод корректен
         {
-            field(a, b, x, y);
+            field(a, b, x, y);        // заполняем  булевское поле
             i++;
         }
-        else if (!correction(a, b, x, y))
+        else if (!correction(a, b, x, y)) // если ввод не корректен
         {
             std::cout << "sorry, but the place is busy";
-        }   
+        } 
+        proverka();
     }
+
+
     // Ввод трех двухпалубных кораблей
     for (int i = 0; i < 3; )
     {
         std::cout << "enter the coordinates of 2 deck " << i + 1 << " ship using a enter: \n\n";
 
         std::cout << "enter the coordinates of the BEGINNING of the ship using enter: \n";
-
-        std::cin >> x;
-        x =  correct_of_input_X(x);
-        std::cin >> y;
-        y = correct_of_input_Y(y);
-
-        std::cout << "enter the coordinates of the END of the ship using enter \n";
+        // проверка корректности ввода начала корабля
         std::cin >> a;
-        a = correct_of_input_A(a);
+        a =  correct_of_input_X(a);
         std::cin >> b;
-        b = correct_of_input_B(b);
+        b = correct_of_input_Y(b);
+        // проверка корректности ввода конца корабля
+        std::cout << "enter the coordinates of the END of the ship using enter \n";
+        std::cin >> x;
+        x = correct_of_input_A(x);
+        std::cin >> y;
+        y = correct_of_input_B(y);
 
-        if (correction(a, b, x, y))
+        // если корабль БОЛЬШЕ , ЧЕМ ДВУХПАЛУБНЫЙ
+        if( abs(a-x) != 1 && b - y ==0 || a - x == 0 && abs(b - y) != 1)
         {
-            field(a, b, x, y);
-            i++;
+            std::cout << " This ship is NOT DOUBLE-decker!!\n";
         }
-        else if (!correction(a, b, x, y))
+
+        // если с расположением все в порядке
+        else 
         {
-            std::cout << "sorry, but the place is busy";
+            if (correction(a, b, x, y)) // если ввод корректен
+            {
+                field(a, b, x, y);      // заполняем булевское поле
+                i++;
+            }
+            else if (!correction(a, b, x, y))  // если ввод не корректен
+            {
+                std::cout << "sorry, but the place is busy\n";
+            }
+        }
+        proverka();
+    }
+
+    // Ввод ДВУХ трехпалубных кораблей
+    for (int i = 0; i < 2; )
+    {
+        std::cout << "enter the coordinates of 3 deck " << i + 1 << " ship using a enter: \n\n";
+
+        std::cout << "enter the coordinates of the BEGINNING of the ship using enter: \n";
+        // проверка корректности ввода начала корабля
+        std::cin >> a;
+        a = correct_of_input_X(a);
+        std::cin >> b;
+        b = correct_of_input_Y(b);
+        // проверка корректности ввода конца корабля
+        std::cout << "enter the coordinates of the END of the ship using enter \n";
+        std::cin >> x;
+        x = correct_of_input_A(x);
+        std::cin >> y;
+        y = correct_of_input_B(y);
+
+        // если корабль БОЛЬШЕ , ЧЕМ ТРЕХПАЛУБНЫЙ!
+        if (abs(a - x) != 2 && b - y == 0 || a - x == 0 && abs(b - y) != 2)
+        {
+            std::cout << " This ship is NOT THREE-decker!!\n";
         }
 
+        // если с расположением все в порядке
+        else
+        {
+            if (correction(a, b, x, y)) // если ввод корректен
+            {
+                field(a, b, x, y);      // заполняем булевское поле
+                i++;
+            }
+            else if (!correction(a, b, x, y))  // если ввод не корректен
+            {
+                std::cout << "sorry, but the place is busy\n";
+            }
+        }
+        proverka();
+    }
 
+    // Ввод КРЕЙСЕРА
+    for (int i = 0; i < 1; )
+    {
+        std::cout << "enter the coordinates of 4 deck " << i + 1 << " ship using a enter: \n\n";
+
+        std::cout << "enter the coordinates of the BEGINNING of the ship using enter: \n";
+        // проверка корректности ввода начала корабля
+        std::cin >> a;
+        a = correct_of_input_X(a);
+        std::cin >> b;
+        b = correct_of_input_Y(b);
+        // проверка корректности ввода конца корабля
+        std::cout << "enter the coordinates of the END of the ship using enter \n";
+        std::cin >> x;
+        x = correct_of_input_A(x);
+        std::cin >> y;
+        y = correct_of_input_B(y);
+
+        // если корабль БОЛЬШЕ , ЧЕМ ЧЕТЫРЕХПАЛУБНЫЙ!
+        if (abs(a - x) != 3 && b - y == 0 || a - x == 0 && abs(b - y) != 3)
+        {
+            std::cout << " This ship is NOT FOUR-decker!!\n";
+        }
+
+        // если с расположением все в порядке
+        else
+        {
+            if (correction(a, b, x, y)) // если ввод корректен
+            {
+                field(a, b, x, y);      // заполняем булевское поле
+                i++;
+            }
+            else if (!correction(a, b, x, y))  // если ввод не корректен
+            {
+                std::cout << "sorry, but the place is busy\n";
+            }
+        }
+        proverka();
     }
 
 
-    
 
-    for (int i = 0; i < 10; i++) {
-        for (int j = 0; j < 10; j++) {
-            bool b = boolean_field[i][j];
-            std::cout << b<< "\t";
-        }
-        std::cout << '\n';
-    }
+
+   // proverka();
     return 0;
 }
 
